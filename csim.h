@@ -8,7 +8,7 @@
 #define CSIM_H
 
 void store();
-std::string hex_to_bit_string(int hex, int len);
+int get_index(int address, int len, int tag_bits, int offset_bits);
 //void write_allocate();
 //void no_write_allocate();
 //void write_back();
