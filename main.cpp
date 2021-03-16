@@ -33,7 +33,7 @@ int main(int argc, char** argv){
 	string allocation = argv[3];
 	string store_type = argv[4];
 
-	map<string, list<string>>* cache;  // pointer ????
+	map<string, list<string>> cache;  // pointer ????
 
 	// statistics
 	int total_loads = 0;
