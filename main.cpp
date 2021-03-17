@@ -1,10 +1,11 @@
+#include "csim.h"
+
 #include <cstdlib>
 #include <cstdio>
 #include <string>
 #include <iostream>
 #include <map>
 #include <list>
-#include "csim.h"
 #include <sstream>
 #include <vector>
 #include <algorithm> 
@@ -19,8 +20,7 @@ using std::list;
 using std::vector;
 
 int main(int argc, char** argv){
-
-	/*
+  
 	// check the correct number of args were provided
 	if (argc != 7) {
 		cout << "Not enough arguments\n";
@@ -43,7 +43,7 @@ int main(int argc, char** argv){
 	int store_hits = 0;
 	int store_misses = 0;
 	int total_cycles = 0;
-	*/
+	
 
 	// read in input
 	for (std::string line; std::getline(cin, line);) {
