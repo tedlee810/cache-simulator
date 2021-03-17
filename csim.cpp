@@ -1,8 +1,9 @@
+#include "csim.h"
+
 #include <cstdlib>
 #include <cstdio>
 #include <string>
 #include <iostream>
-#include "csim.h"
 #include <list>
 #include <map>
 #include <math.h>
@@ -16,7 +17,7 @@ using std::map;
 using std::list;
 using std::find;
 
-void store(map<int, list<int>>* cache, int address, int n_blocks,
+void store(map<int, list<int>> &cache, int address, int n_blocks,
 	   int* store_hits, int* store_misses,
 	   int tag_bits, int offset_bits) {
 	
@@ -30,14 +31,14 @@ void store(map<int, list<int>>* cache, int address, int n_blocks,
   // otherwise, it's a miss
   if (found) {
     (*store_hits)++; // increment store hit count
-    cache[index].splice(cache[index].begin(); cache[index]; cache[index].begin()); // move that element to front
+    cache[index].splice(cache[index].begin(), cache[index], cache[index].begin()); // move that element to front
   } else {
     (*store_misses)++; // increment store miss count
     cache[index].push_front(address); // insert this new address into cache
   }
   
   // potentially do eviction
-  if (cache[index].size() > n_blocks)
+  if ((int)cache[index].size() > n_blocks)
     cache[index].pop_back();
 }
 

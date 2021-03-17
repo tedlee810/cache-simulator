@@ -2,14 +2,14 @@
  * Header file for cahce simulator
  */
 
+#ifndef CSIM_H
+#define CSIM_H
+
 #include <string>
 #include <map>
 #include <list>
 
-#ifndef CSIM_H
-#define CSIM_H
-
-void store(std::map<int, std::list<int>>* cache, int address, int n_blocks,
+void store(std::map<int, std::list<int>> &cache, int address, int n_blocks,
 	   int* store_hits, int* store_misses,
 	   int tag_bits, int offset_bits);
 
