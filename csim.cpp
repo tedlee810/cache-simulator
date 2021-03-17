@@ -14,7 +14,7 @@ using std::string;
 using std::map;
 using std::list;
 
-void store(map<string, list<string>>* cache, int address, int len,
+void store(map<int, list<int>>* cache, int address, int len,
 	   int* store_hits, 
 	   int* store_misses) {
 	

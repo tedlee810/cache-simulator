@@ -33,7 +33,7 @@ int main(int argc, char** argv){
 	string allocation = argv[3];
 	string store_type = argv[4];
 
-	map<string, list<string>> cache;  // pointer ????
+	map<int, list<int>> cache;  // pointer ????
 
 	// statistics
 	int total_loads = 0;
@@ -58,6 +58,16 @@ int main(int argc, char** argv){
 		ss >> x;
 		cout << tokens[0] << endl;
         	cout << x << endl;
+
+		// tokens[2] is the ignored field
+
+		/*
+		if (tokens[0] == "s") {
+			store();
+		} else if (tokens[0] == "l") {
+			load();
+		}
+		*/
 	} 
 
 	return 0;
