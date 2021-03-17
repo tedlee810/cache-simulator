@@ -29,10 +29,10 @@ void store(map<int, list<int>>* cache, int address, int len,
 int get_index(int address, int len, int tag_bits, int offset_bits) {
 	int index = address;
         for(int i = 0; i < tag_bits; i++) {
-                index = index - pow(2, len - 1 - i);
+                index = index - pow(2, len - 1 - i); // take off the tag bits
         }
         for(int i = 0; i < offset_bits; i++) {
-                index = index >> 1;
+                index = index >> 1; // take off the offset bits
         }
 	return index;
 }
