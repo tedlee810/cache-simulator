@@ -19,12 +19,12 @@ using std::list;
 using std::find;
 
 void store(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
-	   int* store_hits, int* store_misses,
-	   int tag_bits, int offset_bits) {
+	   int* store_hits, int* store_misses, int* evictions,
+	   int tag_bits, int offset_bits,
+	   string allocation) {
 	
   // get the index bits from the address
   int index = get_index(address, tag_bits, offset_bits);
-  cout << "index: " << index << endl;
   
   // check to see if address is in cache in that index bit
   bool found = (find(cache[index].begin(), cache[index].end(), address) != cache[index].end());
@@ -36,12 +36,16 @@ void store(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
     cache[index].splice(cache[index].begin(), cache[index], cache[index].begin()); // move that element to front
   } else {
     (*store_misses)++; // increment store miss count
-    cache[index].push_front(address); // insert this new address into cache
+    if (allocation == "write-allocate") {
+      cache[index].push_front(address); // insert this new address into cache 
+    }
   }
   
   // potentially do eviction
-  if ((int) cache[index].size() > n_blocks)
+  if ((int) cache[index].size() > n_blocks) {
+    (*evictions)++;
     cache[index].pop_back();
+  }
 }
 
 int get_index(uint32_t address, int tag_bits, int offset_bits) {
@@ -49,12 +53,37 @@ int get_index(uint32_t address, int tag_bits, int offset_bits) {
   for (int i = 0; i < tag_bits; i++) {
     index = index << 1;
   }
-  cout << "index after << happens in get_index: " << index << endl;
   for (int i = 0; i < (offset_bits + tag_bits); i++) {
     index = index >> 1; // take off the offset bits
   }
-  cout << "index after >> happens in get_index: " << index << endl;
   return (int) index;
+}
+
+void load(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
+           int* load_hits, int* load_misses, int* evictions,
+           int tag_bits, int offset_bits) {
+  // get the index bits from the address
+  int index = get_index(address, tag_bits, offset_bits);
+
+  // check to see if address is in cache in that index bit
+  bool found = (find(cache[index].begin(), cache[index].end(), address) != cache[index].end());	
+
+  // if found, it's a hit;
+  // otherwise, it's a miss
+  if (found) {
+    (*load_hits)++; // increment load hit count
+    cache[index].splice(cache[index].begin(), cache[index], cache[index].begin()); // move that element to front
+  } else {
+    (*load_misses)++; // increment load miss count
+    cache[index].push_front(address); // insert this new address into cache
+  }
+
+  // potentially do eviction
+  if ((int) cache[index].size() > n_blocks) {
+    (*evictions)++;
+    cache[index].pop_back();
+  }
+
 }
 
 /*

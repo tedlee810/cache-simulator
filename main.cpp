@@ -52,13 +52,11 @@ int main(int argc, char** argv){
 	map<int, list<uint32_t>> cache;
 
 	// statistics
-	int total_loads = 0;
-	int total_stores = 0;
 	int load_hits = 0;
 	int load_misses = 0;
 	int store_hits = 0;
 	int store_misses = 0;
-	int total_cycles = 0;
+	int evictions = 0;
 
 	int tag_bits = 32 - log2(n_sets) - log2(n_bytes);
 	int offset_bits = log2(n_bytes);
@@ -76,21 +74,40 @@ int main(int argc, char** argv){
 	  stringstream ss;
 	  ss << hex << tokens[1];
 	  ss >> address;
-	  cout << tokens[0] << endl;
-	  cout << address << endl;
 
 	  // tokens[2] is the ignored field
 	  
+	
 	  if (tokens[0] == "s") {
 	    store(cache, address, n_blocks,
-		  &store_hits, &store_misses,
-		  tag_bits, offset_bits);
-	    print(cache[0]);
-	  } else if (tokens[0] == "cache, address") {
-	    //load();
+		  &store_hits, &store_misses, &evictions,
+		  tag_bits, offset_bits,
+		  allocation);
+	  } else if (tokens[0] == "l") {
+            load(cache, address, n_blocks,
+                  &load_hits, &load_misses, &evictions,
+                  tag_bits, offset_bits);	    
 	  }
-	  cout << endl;
+	  //print(cache[0]);
 	} 
+
+	
+	int total_stores;
+	if (store_type == "write-through") {
+		total_stores = (store_hits + store_misses) * n_bytes / 4;	
+	} else if (store_type == "write-back") {
+		total_stores = evictions * n_bytes / 4;
+	}
+
+	int total_loads = load_misses * n_bytes / 4;
+	
+	cout << "Total stores: " << total_stores << endl;
+	cout << "Total loads: " << total_loads << endl;
+        cout << "Load hits: " << load_hits << endl;
+        cout << "Load misses: " << load_misses << endl;
+	cout << "Store hits: " << store_hits << endl;
+	cout << "Store misses: " << store_misses << endl;
+	
 
 	return 0;
 }

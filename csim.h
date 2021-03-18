@@ -11,8 +11,13 @@
 #include <stdint.h>
 
 void store(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
-	   int* store_hits, int* store_misses,
-	   int tag_bits, int offset_bits);
+	   int* store_hits, int* store_misses, int* evictions,
+	   int tag_bits, int offset_bits,
+	   std::string allocation);
+
+void load(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
+           int* load_hits, int* load_misses, int* evictions,
+           int tag_bits, int offset_bits);
 
 int get_index(uint32_t address, int tag_bits, int offset_bits);
 
