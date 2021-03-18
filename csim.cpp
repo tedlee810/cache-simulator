@@ -49,8 +49,18 @@ int get_index(uint32_t address, int tag_bits, int offset_bits) {
   for (int i = 0; i < tag_bits; i++) {
     index = index << 1;
   }
+  cout << "index after << happens in get_index: " << index << endl;
   for (int i = 0; i < (offset_bits + tag_bits); i++) {
     index = index >> 1; // take off the offset bits
   }
+  cout << "index after >> happens in get_index: " << index << endl;
   return (int) index;
 }
+
+/*
+  SCRATCH PAPER lmao
+
+  ... 00[00 1111 11]11
+  [0011 1111] 1100 ...
+  ... 0000 [0011 1111]
+ */

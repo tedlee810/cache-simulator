@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <math.h>
 #include <list>
 #include <sstream>
 #include <vector>
@@ -18,6 +19,9 @@ using std::endl;
 using std::string;
 using std::getline;
 using std::stringstream;
+using std::istringstream;
+using std::istream_iterator;
+using std::back_inserter;
 using std::map;
 using std::list;
 using std::vector;
@@ -45,7 +49,7 @@ int main(int argc, char** argv){
 
 	cout << "n_blocks: " << n_blocks << endl;
 	
-	map<int, list<uint32_t>> cache;  // pointer ????
+	map<int, list<uint32_t>> cache;
 
 	// statistics
 	int total_loads = 0;
@@ -56,16 +60,19 @@ int main(int argc, char** argv){
 	int store_misses = 0;
 	int total_cycles = 0;
 
-	int tag_bits = 32 - n_sets - n_bytes;
+	int tag_bits = 32 - log2(n_sets) - log2(n_bytes);
+	int offset_bits = log2(n_bytes);
+	cout << "tag_bits: " << tag_bits << endl;
+	cout << "offset_bits: " << offset_bits << endl << endl;
 	
 	// read in input
 	for (string line; getline(cin, line);) {
-	  std::istringstream iss(line);
+	  istringstream iss(line);
 	  vector<string> tokens;
-	  unsigned int address;
-	  copy(std::istream_iterator<string>(iss),
-	       std::istream_iterator<string>(),
-	       std::back_inserter(tokens));		
+	  uint32_t address;
+	  copy(istream_iterator<string>(iss),
+	       istream_iterator<string>(),
+	       back_inserter(tokens));		
 	  stringstream ss;
 	  ss << hex << tokens[1];
 	  ss >> address;
@@ -77,7 +84,7 @@ int main(int argc, char** argv){
 	  if (tokens[0] == "s") {
 	    store(cache, address, n_blocks,
 		  &store_hits, &store_misses,
-		  tag_bits, n_bytes);
+		  tag_bits, offset_bits);
 	    print(cache[0]);
 	  } else if (tokens[0] == "cache, address") {
 	    //load();
