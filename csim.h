@@ -8,12 +8,13 @@
 #include <string>
 #include <map>
 #include <list>
+#include <stdint.h>
 
-void store(std::map<int, std::list<int>> &cache, int address, int n_blocks,
+void store(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
 	   int* store_hits, int* store_misses,
 	   int tag_bits, int offset_bits);
 
-int get_index(int address, int tag_bits, int offset_bits);
+int get_index(uint32_t address, int tag_bits, int offset_bits);
 
 //void write_allocate();
 //void no_write_allocate();

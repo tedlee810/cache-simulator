@@ -1,6 +1,7 @@
 #include "csim.h"
 
 #include <cstdlib>
+#include <stdint.h>
 #include <cstdio>
 #include <string>
 #include <iostream>
@@ -17,12 +18,13 @@ using std::map;
 using std::list;
 using std::find;
 
-void store(map<int, list<int>> &cache, int address, int n_blocks,
+void store(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
 	   int* store_hits, int* store_misses,
 	   int tag_bits, int offset_bits) {
 	
   // get the index bits from the address
   int index = get_index(address, tag_bits, offset_bits);
+  cout << "index: " << index << endl;
   
   // check to see if address is in cache in that index bit
   bool found = (find(cache[index].begin(), cache[index].end(), address) != cache[index].end());
@@ -38,18 +40,17 @@ void store(map<int, list<int>> &cache, int address, int n_blocks,
   }
   
   // potentially do eviction
-  if ((int)cache[index].size() > n_blocks)
+  if ((int) cache[index].size() > n_blocks)
     cache[index].pop_back();
 }
 
-int get_index(int address, int tag_bits, int offset_bits) {
-  int index = address;
-  for(int i = 0; i < tag_bits; i++) {
-    // each address is always 32 bits long
-    index = index - pow(2, 32 - 1 - i); // take off the tag bits
+int get_index(uint32_t address, int tag_bits, int offset_bits) {
+  uint32_t index = address;
+  for (int i = 0; i < tag_bits; i++) {
+    index = index << 1;
   }
-  for(int i = 0; i < offset_bits; i++) {
+  for (int i = 0; i < (offset_bits + tag_bits); i++) {
     index = index >> 1; // take off the offset bits
   }
-  return index;
+  return (int) index;
 }

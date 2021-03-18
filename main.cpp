@@ -10,14 +10,24 @@
 #include <vector>
 #include <algorithm> 
 #include <iterator>
+#include <stdint.h>
 
 using std::cin;
 using std::cout;
 using std::endl;
 using std::string;
+using std::getline;
+using std::stringstream;
 using std::map;
 using std::list;
 using std::vector;
+using std::hex;
+
+void print(list<uint32_t> const &list) {
+  for (auto const & i: list) {
+    cout << "list content: " << i << endl;
+  }
+}
 
 int main(int argc, char** argv){
   
@@ -27,13 +37,15 @@ int main(int argc, char** argv){
 		return 1;
 	}
 
-	int n_sets = atoi(argv[0]);
-	int n_blocks = atoi(argv[1]);  // number of slots in each set
-	int n_bytes = atoi(argv[2]);
-	string allocation = argv[3];
-	string store_type = argv[4];
+	int n_sets = atoi(argv[1]);
+	int n_blocks = atoi(argv[2]);  // number of slots in each set
+	int n_bytes = atoi(argv[3]);
+	string allocation = argv[4];
+	string store_type = argv[5];
 
-	map<int, list<int>> cache;  // pointer ????
+	cout << "n_blocks: " << n_blocks << endl;
+	
+	map<int, list<uint32_t>> cache;  // pointer ????
 
 	// statistics
 	int total_loads = 0;
@@ -43,31 +55,34 @@ int main(int argc, char** argv){
 	int store_hits = 0;
 	int store_misses = 0;
 	int total_cycles = 0;
+
+	int tag_bits = 32 - n_sets - n_bytes;
 	
-
 	// read in input
-	for (std::string line; std::getline(cin, line);) {
-		std::istringstream iss(line);
-		vector<string> tokens;
-		unsigned int x;
-		copy(std::istream_iterator<string>(iss),
-     			std::istream_iterator<string>(),
-     			std::back_inserter(tokens));		
-		std::stringstream ss;
-		ss << std::hex << tokens[1];
-		ss >> x;
-		cout << tokens[0] << endl;
-        	cout << x << endl;
+	for (string line; getline(cin, line);) {
+	  std::istringstream iss(line);
+	  vector<string> tokens;
+	  unsigned int address;
+	  copy(std::istream_iterator<string>(iss),
+	       std::istream_iterator<string>(),
+	       std::back_inserter(tokens));		
+	  stringstream ss;
+	  ss << hex << tokens[1];
+	  ss >> address;
+	  cout << tokens[0] << endl;
+	  cout << address << endl;
 
-		// tokens[2] is the ignored field
-
-		/*
-		if (tokens[0] == "s") {
-			store();
-		} else if (tokens[0] == "l") {
-			load();
-		}
-		*/
+	  // tokens[2] is the ignored field
+	  
+	  if (tokens[0] == "s") {
+	    store(cache, address, n_blocks,
+		  &store_hits, &store_misses,
+		  tag_bits, n_bytes);
+	    print(cache[0]);
+	  } else if (tokens[0] == "cache, address") {
+	    //load();
+	  }
+	  cout << endl;
 	} 
 
 	return 0;
