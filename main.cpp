@@ -108,6 +108,26 @@ int main(int argc, char** argv){
 	cout << "Store hits: " << store_hits << endl;
 	cout << "Store misses: " << store_misses << endl;
 	
+	
+	int total_cycles = 0;
+	if (store_type == "write-through") {
+		total_cycles += store_hits * 100; // write to memory
+		total_cycles += store_hits; // write to cache
+		total_cycles += store_misses * 100; // write to memory
+		total_cycles += store_misses; // write to cache
+		total_cycles += load_misses * 100; // load from memory
+		total_cycles += load_misses; // write to cache
+		total_cycles += load_hits; // load from cache
+	} else if (store_type == "write-back") {
+                total_cycles += store_hits; // write to cache
+                total_cycles += evictions * 100; // write to memory
+                total_cycles += store_misses; // write to cache
+                total_cycles += load_misses * 100; // load from memory
+                total_cycles += load_misses; // write to cache
+                total_cycles += load_hits; // load from cache
+	}
+	
+	cout << "Total cycles: " << total_cycles << endl;
 
 	return 0;
 }
