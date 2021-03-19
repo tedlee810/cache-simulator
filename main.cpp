@@ -56,6 +56,17 @@ int calc_total_cycles(int store_hits, int store_misses,
   return total_cycles;
 }
 
+void print_output(int total_stores, int total_loads, int load_hits, int load_misses,
+		  int store_hits, int store_misses, int total_cycles) {
+  cout << "Total stores: " << total_stores << endl;
+  cout << "Total loads: " << total_loads << endl;
+  cout << "Load hits: " << load_hits << endl;
+  cout << "Load misses: " << load_misses << endl;
+  cout << "Store hits: " << store_hits << endl;
+  cout << "Store misses: " << store_misses << endl; 
+  cout << "Total cycles: " << total_cycles << endl;
+}
+
 int main(int argc, char** argv){
   
   // check the correct number of args were provided
@@ -70,7 +81,7 @@ int main(int argc, char** argv){
   string allocation = argv[4];
   string store_type = argv[5];
   
-  cout << "n_blocks: " << n_blocks << endl;
+  //cout << "n_blocks: " << n_blocks << endl;
   
   map<int, list<uint32_t>> cache;
   
@@ -83,8 +94,8 @@ int main(int argc, char** argv){
   
   int tag_bits = 32 - log2(n_sets) - log2(n_bytes);
   int offset_bits = log2(n_bytes);
-  cout << "tag_bits: " << tag_bits << endl;
-  cout << "offset_bits: " << offset_bits << endl << endl;
+  //cout << "tag_bits: " << tag_bits << endl;
+  //cout << "offset_bits: " << offset_bits << endl << endl;
   
   // read in input
   for (string line; getline(cin, line);) {
@@ -99,7 +110,6 @@ int main(int argc, char** argv){
     ss >> address;
     
     // tokens[2] is the ignored field
-    
     
     if (tokens[0] == "s") {
       store(cache, address, n_blocks,
@@ -117,23 +127,18 @@ int main(int argc, char** argv){
   
   int total_stores;
   if (store_type == "write-through") {
-    total_stores = (store_hits + store_misses) * n_bytes / 4;	
+    total_stores = (store_hits + store_misses) /* * n_bytes / 4*/;	
   } else if (store_type == "write-back") {
-    total_stores = evictions * n_bytes / 4;
+    total_stores = evictions /* * n_bytes / 4*/;
   }
   
-  int total_loads = load_misses * n_bytes / 4;
+  int total_loads = (load_hits + load_misses) /* * n_bytes / 4*/;
   int total_cycles = calc_total_cycles(store_hits, store_misses,
 				       load_hits, load_misses,
 				       evictions, store_type);
-  
-  cout << "Total stores: " << total_stores << endl;
-  cout << "Total loads: " << total_loads << endl;
-  cout << "Load hits: " << load_hits << endl;
-  cout << "Load misses: " << load_misses << endl;
-  cout << "Store hits: " << store_hits << endl;
-  cout << "Store misses: " << store_misses << endl; 
-  cout << "Total cycles: " << total_cycles << endl;
+
+  print_output(total_stores, total_loads, load_hits, load_misses,
+	       store_hits, store_misses, total_cycles);
   
   return 0;
 }
