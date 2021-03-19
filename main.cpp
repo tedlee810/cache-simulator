@@ -129,7 +129,8 @@ int main(int argc, char** argv){
   if (store_type == "write-through") {
     total_stores = (store_hits + store_misses) /* * n_bytes / 4*/;	
   } else if (store_type == "write-back") {
-    total_stores = evictions /* * n_bytes / 4*/;
+    total_stores = (store_hits + evictions) /* * n_bytes / 4*/;
+    // I think we need to add store_hits but MS2 passes store count sim either way so come back to this later?
   }
   
   int total_loads = (load_hits + load_misses) /* * n_bytes / 4*/;
