@@ -35,21 +35,22 @@ void print(list<uint32_t> const &list) {
 
 int calc_total_cycles(int store_hits, int store_misses,
 		      int load_hits, int load_misses,
-		      int evictions, string store_type) {
+		      int evictions, string store_type, int n_bytes) {
   int total_cycles = 0;
+  int memory_cycles = 100/* n_bytes / 4*/;
   if (store_type == "write-through") {
-    total_cycles += store_hits * 100; // write to memory
+    total_cycles += store_hits * memory_cycles; // write to memory
     total_cycles += store_hits; // write to cache
-    total_cycles += store_misses * 100; // write to memory
+    total_cycles += store_misses * memory_cycles; // write to memory
     total_cycles += store_misses; // write to cache
-    total_cycles += load_misses * 100; // load from memory
+    total_cycles += load_misses * memory_cycles; // load from memory
     total_cycles += load_misses; // write to cache
     total_cycles += load_hits; // load from cache
   } else if (store_type == "write-back") {
     total_cycles += store_hits; // write to cache
-    total_cycles += evictions * 100; // write to memory
+    total_cycles += evictions * memory_cycles; // write to memory
     total_cycles += store_misses; // write to cache
-    total_cycles += load_misses * 100; // load from memory
+    total_cycles += load_misses * memory_cycles; // load from memory
     total_cycles += load_misses; // write to cache
     total_cycles += load_hits; // load from cache
   }
@@ -58,8 +59,8 @@ int calc_total_cycles(int store_hits, int store_misses,
 
 void print_output(int total_stores, int total_loads, int load_hits, int load_misses,
 		  int store_hits, int store_misses, int total_cycles) {
-  cout << "Total stores: " << total_stores << endl;
   cout << "Total loads: " << total_loads << endl;
+  cout << "Total stores: " << total_stores << endl;
   cout << "Load hits: " << load_hits << endl;
   cout << "Load misses: " << load_misses << endl;
   cout << "Store hits: " << store_hits << endl;
@@ -124,19 +125,19 @@ int main(int argc, char** argv){
     //print(cache[0]);
   } 
   
-  
+  /*
   int total_stores;
   if (store_type == "write-through") {
-    total_stores = (store_hits + store_misses) /* * n_bytes / 4*/;	
+    total_stores = (store_hits + store_misses);
   } else if (store_type == "write-back") {
-    total_stores = (store_hits + evictions) /* * n_bytes / 4*/;
-    // I think we need to add store_hits but MS2 passes store count sim either way so come back to this later?
-  }
-  
-  int total_loads = (load_hits + load_misses) /* * n_bytes / 4*/;
+    total_stores = store_hits + store_misses;
+ }*/
+
+  int total_stores = store_hits + store_misses;
+  int total_loads = load_hits + load_misses;
   int total_cycles = calc_total_cycles(store_hits, store_misses,
 				       load_hits, load_misses,
-				       evictions, store_type);
+				       evictions, store_type, n_bytes);
 
   print_output(total_stores, total_loads, load_hits, load_misses,
 	       store_hits, store_misses, total_cycles);
