@@ -27,6 +27,21 @@ using std::list;
 using std::vector;
 using std::hex;
 
+int get_index(uint32_t address, int tag_bits, int offset_bits) {
+  uint32_t index = address;
+  index = index << tag_bits;
+  index = index >> (offset_bits + tag_bits);
+  return (int) index;
+}
+
+int get_bits(uint32_t address, int num_bits, int position) {
+  return ((1 << num_bits) - 1) & (address >> (position - 1));
+}
+
+bool is_power_of_two(int num) {
+  return (ceil(log2(num)) == floor(log2(num)));
+}
+
 void print(list<uint32_t> const &list) {
   for (auto const & i: list) {
     cout << "list content: " << i << endl;
@@ -37,21 +52,30 @@ int calc_total_cycles(int store_hits, int store_misses,
 		      int load_hits, int load_misses,
 		      int evictions, string store_type, int n_bytes) {
   int total_cycles = 0;
-  int memory_cycles = 100/* n_bytes / 4*/;
+  //int memory_cycles = 1 + (100 * n_bytes / 4);
+  int memory_cycles = 101;
+
+  // calculate using write-through
   if (store_type == "write-through") {
-    total_cycles += store_hits * memory_cycles; // write to memory
+    total_cycles += load_misses * memory_cycles;
+    total_cycles += load_hits;
+    total_cycles += store_misses * memory_cycles;
+    total_cycles += store_hits;
+
+    /*total_cycles += store_hits * memory_cycles; // write to memory
     total_cycles += store_hits; // write to cache
     total_cycles += store_misses * memory_cycles; // write to memory
     total_cycles += store_misses; // write to cache
     total_cycles += load_misses * memory_cycles; // load from memory
     total_cycles += load_misses; // write to cache
-    total_cycles += load_hits; // load from cache
-  } else if (store_type == "write-back") {
+    total_cycles += load_hits; // load from cache*/
+  }
+  // calculuate using write-back
+  else {
     total_cycles += store_hits; // write to cache
     total_cycles += evictions * memory_cycles; // write to memory
     total_cycles += store_misses; // write to cache
     total_cycles += load_misses * memory_cycles; // load from memory
-    total_cycles += load_misses; // write to cache
     total_cycles += load_hits; // load from cache
   }
   return total_cycles;
@@ -72,7 +96,7 @@ int main(int argc, char** argv){
   
   // check the correct number of args were provided
   if (argc != 7) {
-    cout << "Not enough arguments\n";
+    cout << "Not enough arguments." << endl;
     return 1;
   }
   
@@ -81,8 +105,26 @@ int main(int argc, char** argv){
   int n_bytes = atoi(argv[3]);
   string allocation = argv[4];
   string store_type = argv[5];
-  
-  //cout << "n_blocks: " << n_blocks << endl;
+
+  if (allocation == "no-write-allocate" && store_type == "write-back") {
+    cout << "No-write allocation and write back are invalid." << endl;
+
+    return 2;
+  }
+
+  if (!is_power_of_two(n_sets)) {
+    cout << "Number of sets must be a power of 2." << endl;
+    return 3;
+  } else if (!is_power_of_two(n_blocks)) {
+    cout << "Number of blocks per set must be a power of 2." << endl;
+    return 4;
+  } else if (!is_power_of_two(n_bytes)) {
+    cout << "Number of bytes per block must be a power of 2." << endl;
+    return 5;
+  } else if (n_bytes < 4) {
+    cout << "Number of bytes per block must be at least 4." << endl;
+    return 6;
+  }
   
   map<int, list<uint32_t>> cache;
   
@@ -93,10 +135,9 @@ int main(int argc, char** argv){
   int store_misses = 0;
   int evictions = 0;
   
-  int tag_bits = 32 - log2(n_sets) - log2(n_bytes);
+  int index_bits = log2(n_sets);
   int offset_bits = log2(n_bytes);
-  //cout << "tag_bits: " << tag_bits << endl;
-  //cout << "offset_bits: " << offset_bits << endl << endl;
+  int tag_bits = 32 - index_bits - offset_bits;
   
   // read in input
   for (string line; getline(cin, line);) {
@@ -111,32 +152,25 @@ int main(int argc, char** argv){
     ss >> address;
     
     // tokens[2] is the ignored field
-    
+
+    //int index = get_index(address, tag_bits, offset_bits);
+    int index = get_bits(address, index_bits, tag_bits);
+    address = get_bits(address, tag_bits + index_bits, 0); // new address w/o tag bits
+
+    // if storing
     if (tokens[0] == "s") {
-      store(cache, address, n_blocks,
-	    &store_hits, &store_misses, &evictions,
-	    tag_bits, offset_bits,
-	    allocation);
-    } else if (tokens[0] == "l") {
-      load(cache, address, n_blocks,
-	   &load_hits, &load_misses, &evictions,
-	   tag_bits, offset_bits);	    
+      store(cache, address, n_blocks, &store_hits, &store_misses, &evictions, index, allocation);
+    }
+    // if loading
+    else {
+      load(cache, address, n_blocks, &load_hits, &load_misses, &evictions, index);	    
     }
     //print(cache[0]);
   } 
   
-  /*
-  int total_stores;
-  if (store_type == "write-through") {
-    total_stores = (store_hits + store_misses);
-  } else if (store_type == "write-back") {
-    total_stores = store_hits + store_misses;
- }*/
-
   int total_stores = store_hits + store_misses;
   int total_loads = load_hits + load_misses;
-  int total_cycles = calc_total_cycles(store_hits, store_misses,
-				       load_hits, load_misses,
+  int total_cycles = calc_total_cycles(store_hits, store_misses, load_hits, load_misses,
 				       evictions, store_type, n_bytes);
 
   print_output(total_stores, total_loads, load_hits, load_misses,

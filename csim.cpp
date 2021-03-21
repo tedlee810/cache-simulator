@@ -19,13 +19,9 @@ using std::list;
 using std::find;
 
 void store(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
-	   int* store_hits, int* store_misses, int* evictions,
-	   int tag_bits, int offset_bits,
+	   int* store_hits, int* store_misses, int* evictions, int index,
 	   string allocation) {
 	
-  // get the index bits from the address
-  int index = get_index(address, tag_bits, offset_bits);
-  
   // check to see if address is in cache in that index bit
   bool found = (find(cache[index].begin(), cache[index].end(), address) != cache[index].end());
 
@@ -37,7 +33,7 @@ void store(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
   } else {
     (*store_misses)++; // increment store miss count
     if (allocation == "write-allocate") {
-      cache[index].push_front(address); // insert this new address into cache 
+      cache[index].push_front(address); // insert this new address into cache
     }
   }
   
@@ -48,23 +44,8 @@ void store(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
   }
 }
 
-int get_index(uint32_t address, int tag_bits, int offset_bits) {
-  uint32_t index = address;
-  for (int i = 0; i < tag_bits; i++) {
-    index = index << 1;
-  }
-  for (int i = 0; i < (offset_bits + tag_bits); i++) {
-    index = index >> 1; // take off the offset bits
-  }
-  return (int) index;
-}
-
 void load(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
-           int* load_hits, int* load_misses, int* evictions,
-           int tag_bits, int offset_bits) {
-  // get the index bits from the address
-  int index = get_index(address, tag_bits, offset_bits);
-
+	  int* load_hits, int* load_misses, int* evictions, int index) {
   // check to see if address is in cache in that index bit
   bool found = (find(cache[index].begin(), cache[index].end(), address) != cache[index].end());	
 
