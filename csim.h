@@ -10,11 +10,17 @@
 #include <list>
 #include <stdint.h>
 
-void store(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
+void store_lru(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
 	   int* store_hits, int* store_misses, int* evictions, int index,
 	   std::string allocation);
+void store_fifo(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
+           int* store_hits, int* store_misses, int* evictions, int index,
+           std::string allocation);
 
-void load(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
+void load_lru(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
 	  int* load_hits, int* load_misses, int* evictions, int index);
+
+void load_fifo(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
+          int* load_hits, int* load_misses, int* evictions, int index);
 
 #endif /* CSIM_H */

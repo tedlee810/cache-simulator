@@ -43,8 +43,9 @@ bool is_power_of_two(int num) {
 }
 
 void print(list<uint32_t> const &list) {
+  cout << "list content:" << endl;
   for (auto const & i: list) {
-    cout << "list content: " << i << endl;
+    cout << i << endl;
   }
 }
 
@@ -105,6 +106,7 @@ int main(int argc, char** argv){
   int n_bytes = atoi(argv[3]);
   string allocation = argv[4];
   string store_type = argv[5];
+  string cache_type = argv[6];
 
   if (allocation == "no-write-allocate" && store_type == "write-back") {
     cout << "No-write allocation and write back are invalid." << endl;
@@ -155,17 +157,26 @@ int main(int argc, char** argv){
 
     //int index = get_index(address, tag_bits, offset_bits);
     int index = get_bits(address, index_bits, tag_bits);
-    address = get_bits(address, tag_bits + index_bits, 0); // new address w/o tag bits
+    address = get_bits(address, tag_bits + index_bits, offset_bits); // new address w/o -tag- -offset- bits
 
     // if storing
     if (tokens[0] == "s") {
-      store(cache, address, n_blocks, &store_hits, &store_misses, &evictions, index, allocation);
+      if (cache_type == "lru") {
+        store_lru(cache, address, n_blocks, &store_hits, &store_misses, &evictions, index, allocation);    
+      }
+      else {
+        store_fifo(cache, address, n_blocks, &store_hits, &store_misses, &evictions, index, allocation);
+      }
     }
     // if loading
     else {
-      load(cache, address, n_blocks, &load_hits, &load_misses, &evictions, index);	    
+      if (cache_type == "lru") {
+        load_lru(cache, address, n_blocks, &load_hits, &load_misses, &evictions, index);	    
+      } else {
+        load_fifo(cache, address, n_blocks, &load_hits, &load_misses, &evictions, index);
+      }
     }
-    //print(cache[0]);
+    print(cache[0]);
   } 
   
   int total_stores = store_hits + store_misses;
