@@ -27,14 +27,6 @@ using std::list;
 using std::vector;
 using std::hex;
 
-/*
-int get_index(uint32_t address, int tag_bits, int offset_bits) {
-  uint32_t index = address;
-  index = index << tag_bits;
-  index = index >> (offset_bits + tag_bits);
-  return (int) index;
-  }*/
-
 int get_bits(uint32_t address, int num_bits, int position) {
   return ((1 << num_bits) - 1) & (address >> (position - 1));
 }
@@ -62,7 +54,7 @@ int calc_total_cycles(int store_hits, int store_misses,
     total_cycles += load_misses * memory_cycles;
     total_cycles += load_hits;
     total_cycles += store_misses * memory_cycles;
-    total_cycles += store_hits;
+    total_cycles += store_hits * memory_cycles;
   }
   // calculuate using write-back
   else {
