@@ -47,6 +47,7 @@ void print(list<uint32_t> const &list) {
   for (auto const & i: list) {
     cout << i << endl;
   }
+  cout << endl;
 }
 
 int calc_total_cycles(int store_hits, int store_misses,
@@ -156,8 +157,8 @@ int main(int argc, char** argv){
     // tokens[2] is the ignored field
 
     //int index = get_index(address, tag_bits, offset_bits);
-    int index = get_bits(address, index_bits, tag_bits);
-    address = get_bits(address, tag_bits + index_bits, offset_bits); // new address w/o -tag- -offset- bits
+    int index = get_bits(address, index_bits, offset_bits);
+    address = get_bits(address, tag_bits + index_bits, offset_bits); // new address w/o offset bits
 
     // if storing
     if (tokens[0] == "s") {
@@ -178,7 +179,7 @@ int main(int argc, char** argv){
     }
     print(cache[0]);
   } 
-  
+
   int total_stores = store_hits + store_misses;
   int total_loads = load_hits + load_misses;
   int total_cycles = calc_total_cycles(store_hits, store_misses, load_hits, load_misses,
