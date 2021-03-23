@@ -27,12 +27,13 @@ using std::list;
 using std::vector;
 using std::hex;
 
+/*
 int get_index(uint32_t address, int tag_bits, int offset_bits) {
   uint32_t index = address;
   index = index << tag_bits;
   index = index >> (offset_bits + tag_bits);
   return (int) index;
-}
+  }*/
 
 int get_bits(uint32_t address, int num_bits, int position) {
   return ((1 << num_bits) - 1) & (address >> (position - 1));
@@ -54,8 +55,8 @@ int calc_total_cycles(int store_hits, int store_misses,
 		      int load_hits, int load_misses,
 		      int evictions, string store_type, int n_bytes) {
   int total_cycles = 0;
-  //int memory_cycles = 1 + (100 * n_bytes / 4);
-  int memory_cycles = 101;
+  int memory_cycles = 1 + (100 * n_bytes / 4);
+  //  int memory_cycles = 101;
 
   // calculate using write-through
   if (store_type == "write-through") {
@@ -155,11 +156,16 @@ int main(int argc, char** argv){
     ss >> address;
     
     // tokens[2] is the ignored field
-
+    
     //int index = get_index(address, tag_bits, offset_bits);
-    int index = get_bits(address, index_bits, offset_bits);
-    address = get_bits(address, tag_bits + index_bits, offset_bits); // new address w/o offset bits
+    int index = get_bits(address, index_bits, offset_bits + 1);
 
+    // DEBUGGING ONLY
+    cout << "index of address " << address << " is: " << index << endl;
+    
+    address = get_bits(address, tag_bits + index_bits, offset_bits); // new address w/o offset bits
+    cout << "address after offset bit truncation: " << address << endl << endl;
+    
     // if storing
     if (tokens[0] == "s") {
       if (cache_type == "lru") {
@@ -177,7 +183,7 @@ int main(int argc, char** argv){
         load_fifo(cache, address, n_blocks, &load_hits, &load_misses, &evictions, index);
       }
     }
-    print(cache[0]);
+    //print(cache[0]);
   } 
 
   int total_stores = store_hits + store_misses;
