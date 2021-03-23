@@ -29,7 +29,10 @@ void store_lru(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
   // otherwise, it's a miss
   if (found) {
     (*store_hits)++; // increment store hit count
-    cache[index].splice(cache[index].begin(), cache[index], cache[index].begin()); // move that element to front
+    //cache[index].splice(cache[index].begin(), cache[index], cache[index].begin()); // move that element to front
+    cache[index].remove(address);
+    cache[index].push_front(address);
+
   } else {
     (*store_misses)++; // increment store miss count
     if (allocation == "write-allocate") {
@@ -78,7 +81,9 @@ void load_lru(map<int, list<uint32_t>> &cache, uint32_t address, int n_blocks,
   // otherwise, it's a miss
   if (found) {
     (*load_hits)++; // increment load hit count
-    cache[index].splice(cache[index].begin(), cache[index], cache[index].begin()); // move that element to front
+    //cache[index].splice(cache[index].begin(), cache[index], cache[index].begin()); // move that element to front
+    cache[index].remove(address);
+    cache[index].push_front(address);
   } else {
     (*load_misses)++; // increment load miss count
     cache[index].push_front(address); // insert this new address into cache
