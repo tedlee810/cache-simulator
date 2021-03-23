@@ -56,22 +56,13 @@ int calc_total_cycles(int store_hits, int store_misses,
 		      int evictions, string store_type, int n_bytes) {
   int total_cycles = 0;
   int memory_cycles = 1 + (100 * n_bytes / 4);
-  //  int memory_cycles = 101;
-
+  
   // calculate using write-through
   if (store_type == "write-through") {
     total_cycles += load_misses * memory_cycles;
     total_cycles += load_hits;
     total_cycles += store_misses * memory_cycles;
     total_cycles += store_hits;
-
-    /*total_cycles += store_hits * memory_cycles; // write to memory
-    total_cycles += store_hits; // write to cache
-    total_cycles += store_misses * memory_cycles; // write to memory
-    total_cycles += store_misses; // write to cache
-    total_cycles += load_misses * memory_cycles; // load from memory
-    total_cycles += load_misses; // write to cache
-    total_cycles += load_hits; // load from cache*/
   }
   // calculuate using write-back
   else {
@@ -161,10 +152,10 @@ int main(int argc, char** argv){
     int index = get_bits(address, index_bits, offset_bits + 1);
 
     // DEBUGGING ONLY
-    cout << "index of address " << address << " is: " << index << endl;
+    //cout << "index of address " << address << " is: " << index << endl;
     
-    address = get_bits(address, tag_bits + index_bits, offset_bits); // new address w/o offset bits
-    cout << "address after offset bit truncation: " << address << endl << endl;
+    address = get_bits(address, tag_bits + index_bits, offset_bits + 1); // new address w/o offset bits
+    //cout << "address after offset bit truncation: " << address << endl << endl;
     
     // if storing
     if (tokens[0] == "s") {
