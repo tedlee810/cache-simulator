@@ -45,24 +45,24 @@ void print(list<uint32_t> const &list) {
 
 int calc_total_cycles(int store_hits, int store_misses,
 		      int load_hits, int load_misses,
-		      int evictions, string store_type, int n_bytes) {
-  int total_cycles = 0;
+		      int evictions, string store_type, int n_bytes,
+		      string allocation) {
   int memory_cycles = 1 + (100 * n_bytes / 4);
+  int total_cycles = load_misses * memory_cycles + load_hits;
   
   // calculate using write-through
-  if (store_type == "write-through") {
-    total_cycles += load_misses * memory_cycles;
-    total_cycles += load_hits;
-    total_cycles += store_misses * memory_cycles;
-    total_cycles += store_hits * memory_cycles;
+  if (store_type == "write-through" && allocation == "write-allocate") {
+    total_cycles += store_misses * (memory_cycles + 100);
+    total_cycles += store_hits * 101;
   }
   // calculuate using write-back
-  else {
-    total_cycles += store_hits; // write to cache
-    total_cycles += evictions * memory_cycles; // write to memory
-    total_cycles += store_misses; // write to cache
-    total_cycles += load_misses * memory_cycles; // load from memory
-    total_cycles += load_hits; // load from cache
+  else if (store_type == "write-through" && allocation == "no-write-allocate") {
+    total_cycles += store_hits * 101; // write to cache
+    //total_cycles += evictions * memory_cycles;
+    total_cycles += store_misses * 100; // write to cache
+  } else {
+    total_cycles += store_hits;
+    total_cycles += store_misses * memory_cycles;
   }
   return total_cycles;
 }
@@ -172,7 +172,7 @@ int main(int argc, char** argv){
   int total_stores = store_hits + store_misses;
   int total_loads = load_hits + load_misses;
   int total_cycles = calc_total_cycles(store_hits, store_misses, load_hits, load_misses,
-				       evictions, store_type, n_bytes);
+				       evictions, store_type, n_bytes, allocation);
 
   print_output(total_stores, total_loads, load_hits, load_misses,
 	       store_hits, store_misses, total_cycles);
