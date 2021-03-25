@@ -12,9 +12,9 @@ do
 					do
 						for BLOCKSIZE in 4 256
 						do
-							echo $SETS $ASSOCIATIVITY $BLOCKSIZE $ALLOCATION $WRITE $EVICTION $FILE
-							./csim $SETS 4 16 $ALLOCATION $WRITE $EVICTION < $FILE
-							printf "\n"
+							echo $SETS $ASSOCIATIVITY $BLOCKSIZE $ALLOCATION $WRITE $EVICTION $FILE >> output.txt
+							./csim $SETS $ASSOCIATIVITY $BLOCKSIZE $ALLOCATION $WRITE $EVICTION < $FILE >> output.txt
+							echo "." >> output.txt
 						done
 					done
 				done
