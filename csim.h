@@ -45,18 +45,4 @@ void store(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_bl
 void load(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
 	  int* load_hits, int* load_misses, int* evictions, int index, std::string cache_type);
 
-/**
- * Loads a given address from a cache.
- *
- * @param cache        is a reference to a map<int, list<uint32_t>> that represents the cache.
- * @param address      is the address to store in the cache.
- * @param n_blocks     is the number of blocks per set.
- * @param store_hits   is an integer pointer containing the number of store hits in a cache.
- * @param store_misses is an integer pointer containing the number of store misses in a cache.
- * @param evictions    is an integer pointer containing the number of evictions in a cache.
- * @param index        is an integer representation of the index bits in the address.
- */
-void load_fifo(std::map<int, std::list<uint32_t>> &cache, uint32_t address, int n_blocks,
-	       int* load_hits, int* load_misses, int* evictions, int index);
-
 #endif /* CSIM_H */
